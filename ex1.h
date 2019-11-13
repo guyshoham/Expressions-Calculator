@@ -127,15 +127,15 @@ class Interpreter {
   Expression* interpret(string input);
   void setVariables(string input);
   virtual ~Interpreter();
-  bool isOperand(char& c);
-  bool isOperator(char& c);
-  bool hasHigherPrec(char& top, char& c);
-  bool isOpeningParentheses(char c);
-  bool isClosingParentheses(char c);
+  static bool isOperand(char& c);
+  static bool isOperator(char& c);
+  static bool hasHigherPrec(char& top, char& c);
+  static bool isOpeningParentheses(char cstatic);
+  static bool isClosingParentheses(char c);
   void addToArr(Variable* variable);
-  void replaceAll(string& str, const string& from, const string& to);
-  Value* getWholeValue(string input, int pos, int* posAfter);
-  Expression* createExpressionFromStack(stack<char>* stack);
+  static void replaceAll(string& str, const string& from, const string& to);
+  static Value* getWholeValue(string input, int pos, int* posAfter);
+  static Expression* createExpressionFromStack(stack<char>* stack);
 };
 
 #endif //EX1__EX1_H_

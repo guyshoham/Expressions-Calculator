@@ -5,7 +5,6 @@
 #include "ex1.h"
 #include <stack>
 #include <iostream>
-#include <stdlib.h>
 #include <queue>
 using namespace std;
 
@@ -22,9 +21,7 @@ UnaryOperator::~UnaryOperator() { delete expression; }
 
 /**Plus**/
 Plus::Plus(Expression* left, Expression* right) : BinaryOperator(left, right) {}
-Plus::~Plus() {
-
-}
+Plus::~Plus() = default;
 double Plus::calculate() {
 
   return left->calculate() + right->calculate();
@@ -36,7 +33,7 @@ string Plus::getType() {
 
 /**Minus**/
 Minus::Minus(Expression* left, Expression* right) : BinaryOperator(left, right) {}
-Minus::~Minus() {}
+Minus::~Minus() = default;
 double Minus::calculate() {
 
   return left->calculate() - right->calculate();
@@ -48,7 +45,7 @@ string Minus::getType() {
 
 /**Mul**/
 Mul::Mul(Expression* left, Expression* right) : BinaryOperator(left, right) {}
-Mul::~Mul() {}
+Mul::~Mul() = default;
 double Mul::calculate() {
 
   return left->calculate() * right->calculate();
@@ -60,11 +57,16 @@ string Mul::getType() {
 
 /**Div**/
 Div::Div(Expression* left, Expression* right) : BinaryOperator(left, right) {}
-Div::~Div() {}
+Div::~Div() = default;
 double Div::calculate() {
-
-  return left->calculate() / right->calculate();
-
+  try {
+    if (right->calculate() == 0) {
+      throw "division by zero";
+    }
+    return left->calculate() / right->calculate();
+  } catch (const char* e) {
+    throw e;
+  }
 }
 string Div::getType() {
   return "div";
@@ -72,9 +74,7 @@ string Div::getType() {
 
 /**UPlus**/
 UPlus::UPlus(Expression* expression) : UnaryOperator(expression) {}
-UPlus::~UPlus() {
-
-}
+UPlus::~UPlus() = default;
 double UPlus::calculate() {
 
   return expression->calculate();
@@ -86,9 +86,7 @@ string UPlus::getType() {
 
 /**UMinus**/
 UMinus::UMinus(Expression* expression) : UnaryOperator(expression) {}
-UMinus::~UMinus() {
-
-}
+UMinus::~UMinus() = default;
 double UMinus::calculate() {
 
   return expression->calculate() * -1;
@@ -167,8 +165,8 @@ double Variable::getValue() {
 }
 
 /**Interpreter**/
-Interpreter::Interpreter() {}
-Interpreter::~Interpreter() {}
+Interpreter::Interpreter() = default;
+Interpreter::~Interpreter() = default;
 void Interpreter::setVariables(string input) {
   string delimiter = ";", token, name, value;
   size_t pos = 0;
@@ -177,10 +175,16 @@ void Interpreter::setVariables(string input) {
     input.erase(0, pos + delimiter.length());
     name = token.substr(0, token.find('='));
     value = token.substr(token.find('=') + 1);
-    Variable* variable = new Variable(name, (stod(value)));
-    addToArr(variable);
-    cout << name << "," << value << endl;
-
+    Variable* variable = nullptr;
+    try {
+      variable = new Variable(name, (stod(value)));
+      addToArr(variable);
+    } catch (...) {
+      if (variable != nullptr) {
+        delete variable;
+      }
+      throw "illegal variable assignment!";
+    }
   }
   token = input.substr(0, pos);
   input.erase(0, pos + delimiter.length());
@@ -188,134 +192,132 @@ void Interpreter::setVariables(string input) {
   value = token.substr(token.find('=') + 1);
   Variable* variable = new Variable(name, (stod(value)));
   addToArr(variable);
-  cout << name << "," << value << endl;
 }
 Expression* Interpreter::interpret(string input) {
-  stack<char> operators;
-  queue<Expression*> output;
-  stack<Expression*> expressions;
-  int pos = 0, posAfter = 0;
+  try {
 
-  //replace variables with values
-  for (Variable* ptr : this->variables) {
-    if (ptr == nullptr) { break; }
-    replaceAll(input, ptr->getName(), to_string(ptr->getValue()));
-  }
+    stack<char> operators;
+    queue<Expression*> output;
+    stack<Expression*> expressions;
+    int pos = 0, posAfter = 0;
 
-  //print argument
-  for (char& i : input) {
-    cout << i;
-  }
-  cout << endl;
-
-  //for every char in input string
-  for (char c : input) {
-
-    if (pos < posAfter) {
-      pos++;
-      continue;
+    //replace variables with values
+    for (Variable* ptr : this->variables) {
+      if (ptr == nullptr) { break; }
+      replaceAll(input, ptr->getName(), to_string(ptr->getValue()));
     }
 
-    if (isOperand(c)) {
-      Value* v = getWholeValue(input, pos, &posAfter);
-      output.push(v);
-    } else if (isOperator(c)) {
-      while (!operators.empty()
-          && !isOpeningParentheses(operators.top())
-          && hasHigherPrec(operators.top(), c)) {
-        //push top of operators stack into output queue
-        Expression* e = createExpressionFromStack(&operators);
-        if (e != nullptr) {
-          output.push(e);
+    //for every char in input string
+    for (char c : input) {
+
+      if (pos < posAfter) {
+        pos++;
+        continue;
+      }
+
+      if (isOperand(c)) {
+        Value* v = getWholeValue(input, pos, &posAfter);
+        output.push(v);
+      } else if (isOperator(c)) {
+        while (!operators.empty()
+            && !isOpeningParentheses(operators.top())
+            && hasHigherPrec(operators.top(), c)) {
+          //push top of operators stack into output queue
+          Expression* e = createExpressionFromStack(&operators);
+          if (e != nullptr) {
+            output.push(e);
+          }
+          operators.pop();
+        }
+        if (c == '+' || c == '-') {
+          if (pos == 0 || input[pos - 1] == '(') {
+            operators.push('$');
+          }
+        }
+        operators.push(c);
+      } else if (isOpeningParentheses(c)) {
+        // c = '('
+        operators.push(c);
+      } else if (isClosingParentheses(c)) {
+        // c = ')'
+        while (!operators.empty()
+            && !isOpeningParentheses(operators.top())) {
+          Expression* e = createExpressionFromStack(&operators);
+          if (e != nullptr) {
+            output.push(e);
+          }
+          operators.pop();
         }
         operators.pop();
       }
-      if (c == '+' || c == '-') {
-        if (operators.empty() || input[pos - 1] == '(') {
-          operators.push('$');
-        }
-      }
-      operators.push(c);
-    } else if (isOpeningParentheses(c)) {
-      // c = '('
-      operators.push(c);
-    } else if (isClosingParentheses(c)) {
-      // c = ')'
-      while (!operators.empty()
-          && !isOpeningParentheses(operators.top())) {
-        Expression* e = createExpressionFromStack(&operators);
-        if (e != nullptr) {
-          output.push(e);
-        }
-        operators.pop();
+      pos++;
+    }// end of for loop. end of input
+
+    //empty operators stack and push to output
+    while (!operators.empty()) {
+      Expression* e = createExpressionFromStack(&operators);
+      if (e != nullptr) {
+        output.push(e);
       }
       operators.pop();
     }
-    pos++;
-  }// end of for loop. end of input
 
-  //empty operators stack and push to output
-  while (!operators.empty()) {
-    Expression* e = createExpressionFromStack(&operators);
-    if (e != nullptr) {
-      output.push(e);
+    //starting second task, calculating postfix
+    while (!output.empty()) {
+      Expression* e = output.front();
+      Expression* eLeft;
+      Expression* eRight;
+
+      if (e->getType() == "value") {
+        expressions.push(output.front());
+      } else if (e->getType() == "mul") {
+        eRight = expressions.top();
+        expressions.pop();
+        eLeft = expressions.top();
+        expressions.pop();
+        Mul* mul = new Mul(eLeft, eRight);
+        expressions.push(mul);
+      } else if (e->getType() == "div") {
+        eRight = expressions.top();
+        expressions.pop();
+        eLeft = expressions.top();
+        expressions.pop();
+        Div* div = new Div(eLeft, eRight);
+        expressions.push(div);
+      } else if (e->getType() == "plus") {
+        eRight = expressions.top();
+        expressions.pop();
+        eLeft = expressions.top();
+        expressions.pop();
+        Plus* plus = new Plus(eLeft, eRight);
+        expressions.push(plus);
+      } else if (e->getType() == "minus") {
+        eRight = expressions.top();
+        expressions.pop();
+        eLeft = expressions.top();
+        expressions.pop();
+        Minus* minus = new Minus(eLeft, eRight);
+        expressions.push(minus);
+      } else if (e->getType() == "uplus") {
+        eRight = expressions.top();
+        expressions.pop();
+        UPlus* uPlus = new UPlus(eRight);
+        expressions.push(uPlus);
+      } else if (e->getType() == "uminus") {
+        eRight = expressions.top();
+        expressions.pop();
+        UMinus* uMinus = new UMinus(eRight);
+        expressions.push(uMinus);
+      }
+      output.pop();
     }
-    operators.pop();
+    return expressions.top();
+  } catch (const char* e) {
+    cout << e << std::endl;
   }
-
-  //starting second task, calculating postfix
-  while (!output.empty()) {
-    Expression* e = output.front();
-    Expression* eLeft;
-    Expression* eRight;
-
-    if (e->getType() == "value") {
-      expressions.push(output.front());
-    } else if (e->getType() == "mul") {
-      eRight = expressions.top();
-      expressions.pop();
-      eLeft = expressions.top();
-      expressions.pop();
-      Mul* mul = new Mul(eLeft, eRight);
-      expressions.push(mul);
-    } else if (e->getType() == "div") {
-      eRight = expressions.top();
-      expressions.pop();
-      eLeft = expressions.top();
-      expressions.pop();
-      Div* div = new Div(eLeft, eRight);
-      expressions.push(div);
-    } else if (e->getType() == "plus") {
-      eRight = expressions.top();
-      expressions.pop();
-      eLeft = expressions.top();
-      expressions.pop();
-      Plus* plus = new Plus(eRight, eLeft);
-      expressions.push(plus);
-    } else if (e->getType() == "minus") {
-      eRight = expressions.top();
-      expressions.pop();
-      eLeft = expressions.top();
-      expressions.pop();
-      Minus* minus = new Minus(eRight, eLeft);
-      expressions.push(minus);
-    } else if (e->getType() == "uplus") {
-      eRight = expressions.top();
-      expressions.pop();
-      UPlus* uPlus = new UPlus(eRight);
-      expressions.push(uPlus);
-    } else if (e->getType() == "uminus") {
-      eRight = expressions.top();
-      expressions.pop();
-      UMinus* uMinus = new UMinus(eRight);
-      expressions.push(uMinus);
-    }
-    output.pop();
-  }
-
-  return expressions.top();
 }
 bool Interpreter::isOperand(char& c) {
+
   return c >= 48 && c <= 57;
 }
 bool Interpreter::isOperator(char& c) {
