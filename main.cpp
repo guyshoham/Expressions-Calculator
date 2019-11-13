@@ -77,7 +77,6 @@ int main() {
     e5 = i2->interpret("2*(-(x+y))");
     std::cout << "5: " << e5->calculate() << std::endl;//-14
     delete e5;
-    delete i2;
   } catch (const char* e) {
     if (e5 != nullptr) {
       delete e5;
