@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Guy/CLionProjects/cpp/ex1/Expression.h
+
+C:/Users/Guy/CLionProjects/cpp/ex1/ex1.cpp
+ex1.h
+C:/Users/Guy/CLionProjects/cpp/ex1/ex1.h
+stack
+-
+iostream
+-
+stdlib.h
+-
+queue
+-
+
+C:/Users/Guy/CLionProjects/cpp/ex1/ex1.h
+string
+-
+Expression.h
+C:/Users/Guy/CLionProjects/cpp/ex1/Expression.h
+
