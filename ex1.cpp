@@ -102,7 +102,6 @@ Value::Value(double value) {
   this->value = value;
 
 }
-
 double Value::calculate() {
 
   return value;
@@ -117,7 +116,6 @@ Variable::Variable(string name, double value) {
   this->name = name;
   this->value = value;
 }
-
 double Variable::calculate() {
 
   return value;
@@ -126,22 +124,18 @@ double Variable::calculate() {
 string Variable::getType() {
   return "variable";
 }
-
 Variable& Variable::operator++() {
   value++;
   return *this;
 }
-
 Variable& Variable::operator--() {
   value--;
   return *this;
 }
-
 Variable& Variable::operator+=(double num) {
   value = value + num;
   return *this;
 }
-
 Variable& Variable::operator-=(double num) {
   value = value - num;
   return *this;
@@ -166,7 +160,13 @@ double Variable::getValue() {
 
 /**Interpreter**/
 Interpreter::Interpreter() = default;
-Interpreter::~Interpreter() = default;
+Interpreter::~Interpreter() {
+  for (Variable* v:this->variables) {
+    if (v != nullptr) {
+      delete v;
+    }
+  }
+}
 void Interpreter::setVariables(string input) {
   string delimiter = ";", token, name, value;
   size_t pos = 0;
@@ -277,6 +277,7 @@ Expression* Interpreter::interpret(string input) {
         expressions.pop();
         Mul* mul = new Mul(eLeft, eRight);
         expressions.push(mul);
+        delete e;
       } else if (e->getType() == "div") {
         eRight = expressions.top();
         expressions.pop();
@@ -284,6 +285,7 @@ Expression* Interpreter::interpret(string input) {
         expressions.pop();
         Div* div = new Div(eLeft, eRight);
         expressions.push(div);
+        delete e;
       } else if (e->getType() == "plus") {
         eRight = expressions.top();
         expressions.pop();
@@ -291,6 +293,7 @@ Expression* Interpreter::interpret(string input) {
         expressions.pop();
         Plus* plus = new Plus(eLeft, eRight);
         expressions.push(plus);
+        delete e;
       } else if (e->getType() == "minus") {
         eRight = expressions.top();
         expressions.pop();
@@ -298,16 +301,19 @@ Expression* Interpreter::interpret(string input) {
         expressions.pop();
         Minus* minus = new Minus(eLeft, eRight);
         expressions.push(minus);
+        delete e;
       } else if (e->getType() == "uplus") {
         eRight = expressions.top();
         expressions.pop();
         UPlus* uPlus = new UPlus(eRight);
         expressions.push(uPlus);
+        delete e;
       } else if (e->getType() == "uminus") {
         eRight = expressions.top();
         expressions.pop();
         UMinus* uMinus = new UMinus(eRight);
         expressions.push(uMinus);
+        delete e;
       }
       output.pop();
     }
@@ -315,6 +321,7 @@ Expression* Interpreter::interpret(string input) {
   } catch (const char* e) {
     cout << e << std::endl;
   }
+  return nullptr;
 }
 bool Interpreter::isOperand(char& c) {
 
@@ -342,6 +349,7 @@ void Interpreter::addToArr(Variable* variable) {
     if (ptr == nullptr) { break; }
     if (ptr->getName() == variable->getName()) {
       ptr->setValue(variable->getValue());
+      delete variable;
       return;
     }
     pos++;

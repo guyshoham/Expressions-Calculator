@@ -57,6 +57,7 @@ int main() {
     e4 = i1->interpret("-(2*(3+4))");
     std::cout << "4: " << e4->calculate() << std::endl;//-14
     delete e4;
+    delete i1;
   } catch (const char* e) {
     if (e4 != nullptr) {
       delete e4;
@@ -76,6 +77,7 @@ int main() {
     e5 = i2->interpret("2*(-(x+y))");
     std::cout << "5: " << e5->calculate() << std::endl;//-14
     delete e5;
+    delete i2;
   } catch (const char* e) {
     if (e5 != nullptr) {
       delete e5;
@@ -146,6 +148,7 @@ int main() {
     e9 = i6->interpret("1.0-(-(-16.0))");
     std::cout << "9: " << e9->calculate() << std::endl;// -15
     delete e9;
+    delete i6;
   } catch (const char* e) {
     if (e9 != nullptr) {
       delete e9;
@@ -155,6 +158,7 @@ int main() {
     }
     std::cout << e << std::endl;
   }
+
   // 10
   Interpreter* i7 = new Interpreter();
   Expression* e10 = nullptr;
@@ -163,6 +167,7 @@ int main() {
     e10 = i7->interpret("-(-(-((z+0.5)*(y+(-3.5)))))");
     std::cout << "10: " << e10->calculate() << std::endl;// 5.25
     delete e10;
+    delete i7;
   } catch (const char* e) {
     if (e10 != nullptr) {
       delete e10;
