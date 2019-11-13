@@ -1,5 +1,7 @@
 
 #ifndef PROJECT_EXPRESSION_H
+#include <string>
+using namespace std;
 #define PROJECT_EXPRESSION_H
 
 /**
@@ -11,6 +13,7 @@ class Expression {
   Expression();
   virtual double calculate() = 0;
   virtual ~Expression();
+  virtual string getType();
 };
 
 #endif //PROJECT_EXPRESSION_H

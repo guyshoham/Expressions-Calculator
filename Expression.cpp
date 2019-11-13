@@ -6,3 +6,6 @@
 
 Expression::Expression() {}
 Expression::~Expression() {}
+string Expression::getType() {
+  return "expression";
+}

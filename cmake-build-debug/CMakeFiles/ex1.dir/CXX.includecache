@@ -7,6 +7,8 @@
 #IncludeRegexTransform: 
 
 C:/Users/Guy/CLionProjects/cpp/ex1/Expression.h
+string
+-
 
 C:/Users/Guy/CLionProjects/cpp/ex1/ex1.cpp
 ex1.h
@@ -22,6 +24,8 @@ queue
 
 C:/Users/Guy/CLionProjects/cpp/ex1/ex1.h
 string
+-
+stack
 -
 Expression.h
 C:/Users/Guy/CLionProjects/cpp/ex1/Expression.h
