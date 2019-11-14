@@ -5,6 +5,7 @@
 #ifndef EX1__EX1_H_
 #include <string>
 #include <stack>
+#include <queue>
 #include "Expression.h"
 using namespace std;
 #define EX1__EX1_H_
@@ -136,6 +137,8 @@ class Interpreter {
   static void replaceAll(string& str, const string& from, const string& to);
   static Value* getWholeValue(string input, int pos, int* posAfter);
   static Expression* createExpressionFromStack(stack<char>* stack);
+  queue<Expression*> infixToPostfix(string input);
+  Expression* integrateExpressions(queue<Expression*> output);
 };
 
 #endif //EX1__EX1_H_
