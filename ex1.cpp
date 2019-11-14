@@ -190,15 +190,10 @@ void Interpreter::setVariables(string input) {
   addToArr(variable);
 }
 Expression* Interpreter::interpret(string input) {
-  try {
-    queue<Expression*> output;
-    output = infixToPostfix(input);
-    Expression* finalExpression = integrateExpressions(output);
-    return finalExpression;
-  } catch (const char* e) {
-    cout << e << std::endl;
-  }
-  return nullptr;
+  queue<Expression*> output;
+  output = infixToPostfix(input);
+  Expression* finalExpression = integrateExpressions(output);
+  return finalExpression;
 }
 bool Interpreter::isOperand(char& c) {
 
@@ -298,6 +293,10 @@ queue<Expression*> Interpreter::infixToPostfix(string input) {
   for (Variable* ptr : this->variables) {
     if (ptr == nullptr) { break; }
     replaceAll(input, ptr->getName(), to_string(ptr->getValue()));
+  }
+
+  if (!validateMathExpression(input)) {
+    throw "illegal math expression";
   }
 
   //for every char in input string
@@ -414,4 +413,26 @@ Expression* Interpreter::integrateExpressions(queue<Expression*> output) {
     output.pop();
   }
   return expressions.top();
+}
+bool Interpreter::validateMathExpression(string expression) {
+  int pos = 0;
+  for (char c:expression) {
+
+    if (!(c >= 48 && c <= 57) && c != '(' && c != ')' && c != '+' && c != '-' && c != '*' && c != '/' && c != '.') {
+      return false;
+    }
+    if (pos == 0) {
+      pos++;
+      continue;
+    }
+    if (c == '+' || c == '-' || c == '*' || c == '/') {
+      if (expression[pos - 1] == '+' || expression[pos - 1] == '-' || expression[pos - 1] == '*'
+          || expression[pos - 1] == '/') {
+        return false;
+      }
+    }
+    pos++;
+  }
+
+  return true;
 }

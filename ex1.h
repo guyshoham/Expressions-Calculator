@@ -138,7 +138,8 @@ class Interpreter {
   static Value* getWholeValue(string input, int pos, int* posAfter);
   static Expression* createExpressionFromStack(stack<char>* stack);
   queue<Expression*> infixToPostfix(string input);
-  Expression* integrateExpressions(queue<Expression*> output);
+  static Expression* integrateExpressions(queue<Expression*> output);
+  static bool validateMathExpression(string expression);
 };
 
 #endif //EX1__EX1_H_
