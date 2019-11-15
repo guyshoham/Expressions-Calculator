@@ -9,22 +9,22 @@
 using namespace std;
 
 /**BinaryOperator**/
-BinaryOperator::BinaryOperator(Expression* left, Expression* right) : left(left), right(right) {}
+BinaryOperator::BinaryOperator(Expression* left, Expression* right) : _left(left), _right(right) {}
 BinaryOperator::~BinaryOperator() {
-  delete left;
-  delete right;
+  delete _left;
+  delete _right;
 }
 
 /**UnaryOperator**/
-UnaryOperator::UnaryOperator(Expression* expression) : expression(expression) {}
-UnaryOperator::~UnaryOperator() { delete expression; }
+UnaryOperator::UnaryOperator(Expression* expression) : _expression(expression) {}
+UnaryOperator::~UnaryOperator() { delete _expression; }
 
 /**Plus**/
 Plus::Plus(Expression* left, Expression* right) : BinaryOperator(left, right) {}
 Plus::~Plus() = default;
 double Plus::calculate() {
 
-  return left->calculate() + right->calculate();
+  return _left->calculate() + _right->calculate();
 
 }
 string Plus::getType() {
@@ -36,7 +36,7 @@ Minus::Minus(Expression* left, Expression* right) : BinaryOperator(left, right) 
 Minus::~Minus() = default;
 double Minus::calculate() {
 
-  return left->calculate() - right->calculate();
+  return _left->calculate() - _right->calculate();
 
 }
 string Minus::getType() {
@@ -48,7 +48,7 @@ Mul::Mul(Expression* left, Expression* right) : BinaryOperator(left, right) {}
 Mul::~Mul() = default;
 double Mul::calculate() {
 
-  return left->calculate() * right->calculate();
+  return _left->calculate() * _right->calculate();
 
 }
 string Mul::getType() {
@@ -59,10 +59,10 @@ string Mul::getType() {
 Div::Div(Expression* left, Expression* right) : BinaryOperator(left, right) {}
 Div::~Div() = default;
 double Div::calculate() {
-  if (right->calculate() == 0) {
+  if (_right->calculate() == 0) {
     throw "division by zero";
   }
-  return left->calculate() / right->calculate();
+  return _left->calculate() / _right->calculate();
 }
 string Div::getType() {
   return "div";
@@ -73,7 +73,7 @@ UPlus::UPlus(Expression* expression) : UnaryOperator(expression) {}
 UPlus::~UPlus() = default;
 double UPlus::calculate() {
 
-  return expression->calculate();
+  return _expression->calculate();
 
 }
 string UPlus::getType() {
@@ -85,7 +85,7 @@ UMinus::UMinus(Expression* expression) : UnaryOperator(expression) {}
 UMinus::~UMinus() = default;
 double UMinus::calculate() {
 
-  return expression->calculate() * -1;
+  return _expression->calculate() * -1;
 
 }
 string UMinus::getType() {
@@ -95,12 +95,12 @@ string UMinus::getType() {
 /**Value**/
 Value::Value(double value) {
 
-  this->value = value;
+  this->_value = value;
 
 }
 double Value::calculate() {
 
-  return value;
+  return _value;
 
 }
 string Value::getType() {
@@ -109,55 +109,55 @@ string Value::getType() {
 
 /**Variable**/
 Variable::Variable(string name, double value) {
-  this->name = name;
-  this->value = value;
+  this->_name = name;
+  this->_value = value;
 }
 double Variable::calculate() {
 
-  return value;
+  return _value;
 
 }
 string Variable::getType() {
   return "variable";
 }
 Variable& Variable::operator++() {
-  value++;
+  _value++;
   return *this;
 }
 Variable& Variable::operator--() {
-  value--;
+  _value--;
   return *this;
 }
 Variable& Variable::operator+=(double num) {
-  value = value + num;
+  _value = _value + num;
   return *this;
 }
 Variable& Variable::operator-=(double num) {
-  value = value - num;
+  _value = _value - num;
   return *this;
 }
 Variable& Variable::operator++(int) {
-  value++;
+  _value++;
   return *this;
 }
 Variable& Variable::operator--(int) {
-  value--;
+  _value--;
   return *this;
 }
 void Variable::setValue(double value) {
-  this->value = value;
+  this->_value = value;
 }
 string Variable::getName() {
-  return this->name;
+  return this->_name;
 }
 double Variable::getValue() {
-  return this->value;
+  return this->_value;
 }
 
 /**Interpreter**/
 Interpreter::Interpreter() = default;
 Interpreter::~Interpreter() {
-  for (Variable* v:this->variables) {
+  for (Variable* v:this->_variables) {
     if (v != nullptr) {
       delete v;
     }
@@ -224,7 +224,7 @@ bool Interpreter::isClosingParentheses(char c) {
 }
 void Interpreter::addToArr(Variable* variable) {
   int pos = 0;
-  for (Variable* ptr : this->variables) {
+  for (Variable* ptr : this->_variables) {
     if (ptr == nullptr) { break; }
     if (ptr->getName() == variable->getName()) {
       ptr->setValue(variable->getValue());
@@ -233,7 +233,7 @@ void Interpreter::addToArr(Variable* variable) {
     }
     pos++;
   }
-  variables[pos] = variable;
+  _variables[pos] = variable;
 }
 void Interpreter::replaceAll(string& str, const string& from, const string& to) {
   if (from.empty())
@@ -246,7 +246,7 @@ void Interpreter::replaceAll(string& str, const string& from, const string& to) 
 }
 Value* Interpreter::getWholeValue(string input, int pos, int* posAfter) {
 
-  if (pos == input.length() - 1) {
+  if (pos == (signed) input.length() - 1) {
     Value* v = new Value(input[pos] - 48);
     *posAfter = pos;
     return v;
@@ -304,7 +304,7 @@ queue<Expression*> Interpreter::infixToPostfix(string input) {
   int pos = 0, posAfter = 0;
 
   //replace variables with values
-  for (Variable* ptr : this->variables) {
+  for (Variable* ptr : this->_variables) {
     if (ptr == nullptr) { break; }
     string value = '(' + to_string(ptr->getValue()) + ')';
     replaceAll(input, ptr->getName(), value);

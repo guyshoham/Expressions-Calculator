@@ -12,7 +12,7 @@ using namespace std;
 
 class Value : public Expression {
 
-  double value;
+  double _value;
 
  public:
   Value(double value);
@@ -22,9 +22,9 @@ class Value : public Expression {
 };
 
 class Variable : public Expression {
-  string name;
+  string _name;
 
-  double value;
+  double _value;
 
  public:
   Variable(string name, double value);
@@ -44,7 +44,7 @@ class Variable : public Expression {
 
 class BinaryOperator : public Expression {
  protected:
-  Expression* left, * right;
+  Expression* _left, * _right;
 
  public:
   BinaryOperator(Expression* left, Expression* right);
@@ -53,7 +53,7 @@ class BinaryOperator : public Expression {
 
 class UnaryOperator : public Expression {
  protected:
-  Expression* expression;
+  Expression* _expression;
 
  public:
   UnaryOperator(Expression* expression);
@@ -121,7 +121,7 @@ class UMinus : public UnaryOperator {
 
 class Interpreter {
 
-  Variable* variables[10] = {nullptr};
+  Variable* _variables[10] = {nullptr};
 
  public:
   Interpreter();
@@ -140,7 +140,7 @@ class Interpreter {
   queue<Expression*> infixToPostfix(string input);
   static Expression* integrateExpressions(queue<Expression*> output);
   static bool validateMathExpression(string expression);
-  static bool validateVariableExpression(string expression,char symbol);
+  static bool validateVariableExpression(string expression, char symbol);
   static bool validateVariableName(string name);
   static bool validateVariableValue(string value);
 };
