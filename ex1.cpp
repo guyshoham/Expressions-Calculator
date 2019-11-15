@@ -425,9 +425,9 @@ bool Interpreter::validateMathExpression(string expression) {
       pos++;
       continue;
     }
-    if (c == '+' || c == '-' || c == '*' || c == '/') {
+    if (c == '+' || c == '-' || c == '*' || c == '/' || c == '.') {
       if (expression[pos - 1] == '+' || expression[pos - 1] == '-' || expression[pos - 1] == '*'
-          || expression[pos - 1] == '/') {
+          || expression[pos - 1] == '/' || expression[pos - 1] == '.') {
         return false;
       }
     }
