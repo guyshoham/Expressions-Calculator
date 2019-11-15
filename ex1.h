@@ -140,6 +140,9 @@ class Interpreter {
   queue<Expression*> infixToPostfix(string input);
   static Expression* integrateExpressions(queue<Expression*> output);
   static bool validateMathExpression(string expression);
+  static bool validateVariableExpression(string expression,char symbol);
+  static bool validateVariableName(string name);
+  static bool validateVariableValue(string value);
 };
 
 #endif //EX1__EX1_H_

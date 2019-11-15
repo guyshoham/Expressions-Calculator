@@ -164,6 +164,11 @@ Interpreter::~Interpreter() {
   }
 }
 void Interpreter::setVariables(string input) {
+
+  if (!validateVariableExpression(input, '=') || !validateVariableExpression(input, ';')) {
+    throw "illegal variable assignment!";
+  }
+
   string delimiter = ";", token, name, value;
   size_t pos = 0;
   while ((pos = input.find(delimiter)) != string::npos) {
@@ -171,21 +176,23 @@ void Interpreter::setVariables(string input) {
     input.erase(0, pos + delimiter.length());
     name = token.substr(0, token.find('='));
     value = token.substr(token.find('=') + 1);
-    Variable* variable = nullptr;
-    try {
-      variable = new Variable(name, (stod(value)));
-      addToArr(variable);
-    } catch (...) {
-      if (variable != nullptr) {
-        delete variable;
-      }
+
+    if (!validateVariableName(name) || !validateVariableValue(value)) {
       throw "illegal variable assignment!";
     }
+
+    Variable* variable = new Variable(name, (stod(value)));
+    addToArr(variable);
   }
   token = input.substr(0, pos);
   input.erase(0, pos + delimiter.length());
   name = token.substr(0, token.find('='));
   value = token.substr(token.find('=') + 1);
+
+  if (!validateVariableName(name) || !validateVariableValue(value)) {
+    throw "illegal variable assignment!";
+  }
+
   Variable* variable = new Variable(name, (stod(value)));
   addToArr(variable);
 }
@@ -197,7 +204,7 @@ Expression* Interpreter::interpret(string input) {
 }
 bool Interpreter::isOperand(char& c) {
 
-  return c >= 48 && c <= 57;
+  return c >= '0' && c <= '9';
 }
 bool Interpreter::isOperator(char& c) {
   return c == '+' || c == '-' || c == '*' || c == '/';
@@ -238,6 +245,13 @@ void Interpreter::replaceAll(string& str, const string& from, const string& to) 
   }
 }
 Value* Interpreter::getWholeValue(string input, int pos, int* posAfter) {
+
+  if (pos == input.length() - 1) {
+    Value* v = new Value(input[pos] - 48);
+    *posAfter = pos;
+    return v;
+  }
+
   int originalPos = pos;
   while (isOperand(input.at(pos)) || input.at(pos) == '.') {
     pos++;
@@ -292,7 +306,9 @@ queue<Expression*> Interpreter::infixToPostfix(string input) {
   //replace variables with values
   for (Variable* ptr : this->variables) {
     if (ptr == nullptr) { break; }
-    replaceAll(input, ptr->getName(), to_string(ptr->getValue()));
+    string value = '(' + to_string(ptr->getValue()) + ')';
+    replaceAll(input, ptr->getName(), value);
+    replaceAll(input, " ", "");
   }
 
   if (!validateMathExpression(input)) {
@@ -414,11 +430,72 @@ Expression* Interpreter::integrateExpressions(queue<Expression*> output) {
   }
   return expressions.top();
 }
+bool Interpreter::validateVariableExpression(string expression, char symbol) {
+  int pos = 0;
+  //check that the symbol does not appear twice in a row
+  for (char c: expression) {
+    if (c == symbol) {
+      if (pos == 0) {
+        continue;
+      } else {
+        if (expression[pos - 1] == symbol) {
+          return false;
+        }
+      }
+    }
+    pos++;
+  }
+
+  return true;
+}
+bool Interpreter::validateVariableName(string name) {
+
+  //check if first char is a digit
+  if (name[0] >= '0' && name[0] <= '9') {
+    return false;
+  }
+
+  //check every char is 0-9, A-z, or '_'
+  for (char c: name) {
+    if (!(c >= '0' && c <= '9') && !(c >= 'A' && c <= 'z') && c != '_') {
+      return false;
+    }
+  }
+
+  return true;
+}
+bool Interpreter::validateVariableValue(string value) {
+  int pos = 0;
+  bool foundPeriod = false;
+  for (char c: value) {
+    //first char can be '-'
+    if (pos == 0) {
+      if (c == '-') {
+        continue;
+      }
+    }
+    //check that every digit is 0-9 or '.'
+    if (!(c >= '0' && c <= '9') && c != '.') {
+      return false;
+    }
+    // check there is no '.' twice
+    if (c == '.') {
+      if (!foundPeriod) {
+        foundPeriod = true;
+      } else {
+        return false;
+      }
+    }
+    pos++;
+  }
+  return true;
+}
 bool Interpreter::validateMathExpression(string expression) {
   int pos = 0;
   for (char c:expression) {
 
-    if (!(c >= 48 && c <= 57) && c != '(' && c != ')' && c != '+' && c != '-' && c != '*' && c != '/' && c != '.') {
+    if (!(c >= '0' && c <= '9') && c != '(' && c != ')' && c != '+' && c != '-' && c != '*' && c != '/' && c != '.'
+        && c != ' ') {
       return false;
     }
     if (pos == 0) {

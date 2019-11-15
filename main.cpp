@@ -195,6 +195,25 @@ int main() {
     }
     std::cout << e << std::endl;
   }
+
+  Interpreter* i9 = new Interpreter();
+  Expression* e12 = nullptr;
+  try {
+    // 12
+    i9->setVariables("x=1;y=-5");
+    e12 = i9->interpret("- ( + ( - ( x) )  ) ");
+    std::cout << "12: " << e12->calculate() << std::endl;
+    delete e12;
+    delete i9;
+  } catch (const char* e) {
+    if (e12 != nullptr) {
+      delete e12;
+    }
+    if (i9 != nullptr) {
+      delete i9;
+    }
+    std::cout << e << std::endl;
+  }
   return 0;
 }
 
