@@ -4,7 +4,6 @@
 
 #include "ex1.h"
 #include <stack>
-#include <iostream>
 #include <queue>
 using namespace std;
 
