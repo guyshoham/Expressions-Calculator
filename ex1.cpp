@@ -92,11 +92,8 @@ string UMinus::getType() {
 }
 
 /**Value**/
-Value::Value(double value) {
+Value::Value(double value) : _value(value) {}
 
-  this->_value = value;
-
-}
 double Value::calculate() {
 
   return _value;
@@ -201,24 +198,24 @@ Expression* Interpreter::interpret(string input) {
   Expression* finalExpression = integrateExpressions(output);
   return finalExpression;
 }
-bool Interpreter::isOperand(char& c) {
+bool Interpreter::isOperand(const char& c) {
 
   return c >= '0' && c <= '9';
 }
-bool Interpreter::isOperator(char& c) {
+bool Interpreter::isOperator(const char& c) {
   return c == '+' || c == '-' || c == '*' || c == '/';
 }
-bool Interpreter::hasHigherPrec(char& top, char& c) {
+bool Interpreter::hasHigherPrec(const char& top, const char& c) {
   if (c == '+' || c == '-') {
     if (top == '*' || top == '/')
       return true;
   }
   return false;
 }
-bool Interpreter::isOpeningParentheses(char c) {
+bool Interpreter::isOpeningParentheses(const char c) {
   return c == '(';
 }
-bool Interpreter::isClosingParentheses(char c) {
+bool Interpreter::isClosingParentheses(const char c) {
   return c == ')';
 }
 void Interpreter::addToArr(Variable* variable) {
@@ -429,7 +426,7 @@ Expression* Interpreter::integrateExpressions(queue<Expression*> output) {
   }
   return expressions.top();
 }
-bool Interpreter::validateVariableExpression(string expression, char symbol) {
+bool Interpreter::validateVariableExpression(const string expression, const char symbol) {
   int pos = 0;
   //check that the symbol does not appear twice in a row
   for (char c: expression) {
@@ -447,7 +444,7 @@ bool Interpreter::validateVariableExpression(string expression, char symbol) {
 
   return true;
 }
-bool Interpreter::validateVariableName(string name) {
+bool Interpreter::validateVariableName(const string name) {
 
   //check if first char is a digit
   if (name[0] >= '0' && name[0] <= '9') {
@@ -463,7 +460,7 @@ bool Interpreter::validateVariableName(string name) {
 
   return true;
 }
-bool Interpreter::validateVariableValue(string value) {
+bool Interpreter::validateVariableValue(const string value) {
   int pos = 0;
   bool foundPeriod = false;
   for (char c: value) {
@@ -489,7 +486,7 @@ bool Interpreter::validateVariableValue(string value) {
   }
   return true;
 }
-bool Interpreter::validateMathExpression(string expression) {
+bool Interpreter::validateMathExpression(const string expression) {
   int pos = 0;
   for (char c:expression) {
 

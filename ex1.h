@@ -12,7 +12,7 @@ using namespace std;
 
 class Value : public Expression {
 
-  double _value;
+  const double _value;
 
  public:
   Value(double value);
@@ -128,21 +128,21 @@ class Interpreter {
   Expression* interpret(string input);
   void setVariables(string input);
   virtual ~Interpreter();
-  static bool isOperand(char& c);
-  static bool isOperator(char& c);
-  static bool hasHigherPrec(char& top, char& c);
-  static bool isOpeningParentheses(char cstatic);
-  static bool isClosingParentheses(char c);
+  static bool isOperand(const char& c);
+  static bool isOperator(const char& c);
+  static bool hasHigherPrec(const char& top, const char& c);
+  static bool isOpeningParentheses(const char c);
+  static bool isClosingParentheses(const char c);
   void addToArr(Variable* variable);
   static void replaceAll(string& str, const string& from, const string& to);
   static Value* getWholeValue(string input, int pos, int* posAfter);
   static Expression* createExpressionFromStack(stack<char>* stack);
   queue<Expression*> infixToPostfix(string input);
   static Expression* integrateExpressions(queue<Expression*> output);
-  static bool validateMathExpression(string expression);
-  static bool validateVariableExpression(string expression, char symbol);
-  static bool validateVariableName(string name);
-  static bool validateVariableValue(string value);
+  static bool validateMathExpression(const string expression);
+  static bool validateVariableExpression(const string expression, const char symbol);
+  static bool validateVariableName(const string name);
+  static bool validateVariableValue(const string value);
 };
 
 #endif //EX1__EX1_H_
