@@ -1,11 +1,12 @@
-//
-// Created by Guy on 04/11/2019.
-//
-
 #include "ex1.h"
 #include <stack>
 #include <queue>
 using namespace std;
+
+/**Expression**/
+Expression::Expression() {}
+Expression::~Expression() {}
+string Expression::getType() { return "expression"; }
 
 /**BinaryOperator**/
 BinaryOperator::BinaryOperator(Expression* left, Expression* right) : _left(left), _right(right) {}
@@ -21,38 +22,20 @@ UnaryOperator::~UnaryOperator() { delete _expression; }
 /**Plus**/
 Plus::Plus(Expression* left, Expression* right) : BinaryOperator(left, right) {}
 Plus::~Plus() = default;
-double Plus::calculate() {
-
-  return _left->calculate() + _right->calculate();
-
-}
-string Plus::getType() {
-  return "plus";
-}
+double Plus::calculate() { return _left->calculate() + _right->calculate(); }
+string Plus::getType() { return "plus"; }
 
 /**Minus**/
 Minus::Minus(Expression* left, Expression* right) : BinaryOperator(left, right) {}
 Minus::~Minus() = default;
-double Minus::calculate() {
-
-  return _left->calculate() - _right->calculate();
-
-}
-string Minus::getType() {
-  return "minus";
-}
+double Minus::calculate() { return _left->calculate() - _right->calculate(); }
+string Minus::getType() { return "minus"; }
 
 /**Mul**/
 Mul::Mul(Expression* left, Expression* right) : BinaryOperator(left, right) {}
 Mul::~Mul() = default;
-double Mul::calculate() {
-
-  return _left->calculate() * _right->calculate();
-
-}
-string Mul::getType() {
-  return "mul";
-}
+double Mul::calculate() { return _left->calculate() * _right->calculate(); }
+string Mul::getType() { return "mul"; }
 
 /**Div**/
 Div::Div(Expression* left, Expression* right) : BinaryOperator(left, right) {}
@@ -63,59 +46,33 @@ double Div::calculate() {
   }
   return _left->calculate() / _right->calculate();
 }
-string Div::getType() {
-  return "div";
-}
+string Div::getType() { return "div"; }
 
 /**UPlus**/
 UPlus::UPlus(Expression* expression) : UnaryOperator(expression) {}
 UPlus::~UPlus() = default;
-double UPlus::calculate() {
-
-  return _expression->calculate();
-
-}
-string UPlus::getType() {
-  return "uplus";
-}
+double UPlus::calculate() { return _expression->calculate(); }
+string UPlus::getType() { return "uplus"; }
 
 /**UMinus**/
 UMinus::UMinus(Expression* expression) : UnaryOperator(expression) {}
 UMinus::~UMinus() = default;
-double UMinus::calculate() {
-
-  return _expression->calculate() * -1;
-
-}
-string UMinus::getType() {
-  return "uminus";
-}
+double UMinus::calculate() { return _expression->calculate() * -1; }
+string UMinus::getType() { return "uminus"; }
 
 /**Value**/
 Value::Value(double value) : _value(value) {}
 
-double Value::calculate() {
-
-  return _value;
-
-}
-string Value::getType() {
-  return "value";
-}
+double Value::calculate() { return _value; }
+string Value::getType() { return "value"; }
 
 /**Variable**/
 Variable::Variable(string name, double value) {
   this->_name = name;
   this->_value = value;
 }
-double Variable::calculate() {
-
-  return _value;
-
-}
-string Variable::getType() {
-  return "variable";
-}
+double Variable::calculate() { return _value; }
+string Variable::getType() { return "variable"; }
 Variable& Variable::operator++() {
   _value++;
   return *this;
@@ -140,15 +97,9 @@ Variable& Variable::operator--(int) {
   _value--;
   return *this;
 }
-void Variable::setValue(double value) {
-  this->_value = value;
-}
-string Variable::getName() {
-  return this->_name;
-}
-double Variable::getValue() {
-  return this->_value;
-}
+void Variable::setValue(double value) { this->_value = value; }
+string Variable::getName() { return this->_name; }
+double Variable::getValue() { return this->_value; }
 
 /**Interpreter**/
 Interpreter::Interpreter() = default;
@@ -198,13 +149,8 @@ Expression* Interpreter::interpret(string input) {
   Expression* finalExpression = integrateExpressions(output);
   return finalExpression;
 }
-bool Interpreter::isOperand(const char& c) {
-
-  return c >= '0' && c <= '9';
-}
-bool Interpreter::isOperator(const char& c) {
-  return c == '+' || c == '-' || c == '*' || c == '/';
-}
+bool Interpreter::isOperand(const char& c) { return c >= '0' && c <= '9'; }
+bool Interpreter::isOperator(const char& c) { return c == '+' || c == '-' || c == '*' || c == '/'; }
 bool Interpreter::hasHigherPrec(const char& top, const char& c) {
   if (c == '+' || c == '-') {
     if (top == '*' || top == '/')
@@ -212,12 +158,8 @@ bool Interpreter::hasHigherPrec(const char& top, const char& c) {
   }
   return false;
 }
-bool Interpreter::isOpeningParentheses(const char c) {
-  return c == '(';
-}
-bool Interpreter::isClosingParentheses(const char c) {
-  return c == ')';
-}
+bool Interpreter::isOpeningParentheses(const char c) { return c == '('; }
+bool Interpreter::isClosingParentheses(const char c) { return c == ')'; }
 void Interpreter::addToArr(Variable* variable) {
   int pos = 0;
   for (Variable* ptr : this->_variables) {

@@ -1,14 +1,16 @@
-//
-// Created by Guy on 04/11/2019.
-//
-
 #ifndef EX1__EX1_H_
 #include <string>
 #include <stack>
 #include <queue>
-#include "Expression.h"
 using namespace std;
 #define EX1__EX1_H_
+class Expression {
+ public:
+  Expression();
+  virtual double calculate() = 0;
+  virtual string getType();
+  virtual ~Expression();
+};
 
 class Value : public Expression {
 
@@ -17,7 +19,7 @@ class Value : public Expression {
  public:
   Value(double value);
   double calculate();
-  string getType();
+  virtual string getType();
 
 };
 
@@ -35,7 +37,7 @@ class Variable : public Expression {
   Variable& operator-=(double num);
   Variable& operator++(int);
   Variable& operator--(int);
-  string getType();
+  virtual string getType();
   string getName();
   double getValue();
   void setValue(double value);
@@ -66,7 +68,7 @@ class Plus : public BinaryOperator {
   Plus(Expression* left, Expression* right);
   double calculate();
   virtual ~Plus();
-  string getType();
+  virtual string getType();
 
 };
 
@@ -76,7 +78,7 @@ class Minus : public BinaryOperator {
   Minus(Expression* left, Expression* right);
   double calculate();
   virtual ~Minus();
-  string getType();
+  virtual string getType();
 
 };
 
@@ -86,7 +88,7 @@ class Mul : public BinaryOperator {
   Mul(Expression* left, Expression* right);
   double calculate();
   virtual ~Mul();
-  string getType();
+  virtual string getType();
 
 };
 
@@ -95,7 +97,7 @@ class Div : public BinaryOperator {
  public:
   Div(Expression* left, Expression* right);
   double calculate();
-  string getType();
+  virtual string getType();
   virtual ~Div();
 };
 
@@ -105,7 +107,7 @@ class UPlus : public UnaryOperator {
   UPlus(Expression* expression);
   double calculate();
   virtual ~UPlus();
-  string getType();
+  virtual string getType();
 
 };
 
@@ -115,12 +117,11 @@ class UMinus : public UnaryOperator {
   UMinus(Expression* expression);
   double calculate();
   virtual ~UMinus();
-  string getType();
+  virtual string getType();
 
 };
 
 class Interpreter {
-
   Variable* _variables[10] = {nullptr};
 
  public:
