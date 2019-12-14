@@ -2,15 +2,11 @@
 #include <string>
 #include <stack>
 #include <queue>
+#include <typeinfo>
+#include "Expression.h"
+
 using namespace std;
 #define EX1__EX1_H_
-class Expression {
- public:
-  Expression();
-  virtual double calculate() = 0;
-  virtual string getType();
-  virtual ~Expression();
-};
 
 class Value : public Expression {
 

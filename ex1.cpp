@@ -1,12 +1,9 @@
 #include "ex1.h"
+#include "Expression.h"
 #include <stack>
 #include <queue>
-using namespace std;
 
-/**Expression**/
-Expression::Expression() {}
-Expression::~Expression() {}
-string Expression::getType() { return "expression"; }
+using namespace std;
 
 /**BinaryOperator**/
 BinaryOperator::BinaryOperator(Expression* left, Expression* right) : _left(left), _right(right) {}
@@ -317,9 +314,9 @@ Expression* Interpreter::integrateExpressions(queue<Expression*> output) {
     Expression* eLeft;
     Expression* eRight;
 
-    if (e->getType() == "value") {
+    if (typeid(*e) == typeid(Value)) {
       expressions.push(output.front());
-    } else if (e->getType() == "mul") {
+    } else if (typeid(*e) == typeid(Mul)) {
       eRight = expressions.top();
       expressions.pop();
       eLeft = expressions.top();
@@ -327,7 +324,7 @@ Expression* Interpreter::integrateExpressions(queue<Expression*> output) {
       Mul* mul = new Mul(eLeft, eRight);
       expressions.push(mul);
       delete e;
-    } else if (e->getType() == "div") {
+    } else if (typeid(*e) == typeid(Div)) {
       eRight = expressions.top();
       expressions.pop();
       eLeft = expressions.top();
@@ -335,7 +332,7 @@ Expression* Interpreter::integrateExpressions(queue<Expression*> output) {
       Div* div = new Div(eLeft, eRight);
       expressions.push(div);
       delete e;
-    } else if (e->getType() == "plus") {
+    } else if (typeid(*e) == typeid(Plus)) {
       eRight = expressions.top();
       expressions.pop();
       eLeft = expressions.top();
@@ -343,7 +340,7 @@ Expression* Interpreter::integrateExpressions(queue<Expression*> output) {
       Plus* plus = new Plus(eLeft, eRight);
       expressions.push(plus);
       delete e;
-    } else if (e->getType() == "minus") {
+    } else if (typeid(*e) == typeid(Minus)) {
       eRight = expressions.top();
       expressions.pop();
       eLeft = expressions.top();
@@ -351,13 +348,13 @@ Expression* Interpreter::integrateExpressions(queue<Expression*> output) {
       Minus* minus = new Minus(eLeft, eRight);
       expressions.push(minus);
       delete e;
-    } else if (e->getType() == "uplus") {
+    } else if (typeid(*e) == typeid(UPlus)) {
       eRight = expressions.top();
       expressions.pop();
       UPlus* uPlus = new UPlus(eRight);
       expressions.push(uPlus);
       delete e;
-    } else if (e->getType() == "uminus") {
+    } else if (typeid(*e) == typeid(UMinus)) {
       eRight = expressions.top();
       expressions.pop();
       UMinus* uMinus = new UMinus(eRight);
