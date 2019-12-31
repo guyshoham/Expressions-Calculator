@@ -261,6 +261,15 @@ queue<Expression*> Interpreter::infixToPostfix(string input) {
     if (isOperand(c)) {
       Value* v = getWholeValue(input, pos, &posAfter);
       output.push(v);
+
+      if (!operators.empty() && !isOpeningParentheses(operators.top())) {
+        Expression* e = createExpressionFromStack(&operators);
+        if (e != nullptr) {
+          output.push(e);
+        }
+        operators.pop();
+      }
+
     } else if (isOperator(c)) {
       while (!operators.empty()
           && !isOpeningParentheses(operators.top())
@@ -283,8 +292,7 @@ queue<Expression*> Interpreter::infixToPostfix(string input) {
       operators.push(c);
     } else if (isClosingParentheses(c)) {
       // c = ')'
-      while (!operators.empty()
-          && !isOpeningParentheses(operators.top())) {
+      while (!operators.empty() && !isOpeningParentheses(operators.top())) { // not empty and not '('
         Expression* e = createExpressionFromStack(&operators);
         if (e != nullptr) {
           output.push(e);
@@ -292,6 +300,13 @@ queue<Expression*> Interpreter::infixToPostfix(string input) {
         operators.pop();
       }
       operators.pop();
+      while (!operators.empty() && !isOpeningParentheses(operators.top())) {
+        Expression* e = createExpressionFromStack(&operators);
+        if (e != nullptr) {
+          output.push(e);
+        }
+        operators.pop();
+      }
     }
     pos++;
   }// end of for loop. end of input
